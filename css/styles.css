@@ -1,0 +1,44 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+#container {
+  display: flex;
+}
+
+#sidebar {
+  display: flex;
+  flex: 0 0 240px;
+  flex-direction: column;
+  position: relative;
+}
+
+#canvas {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#viewport {
+  width: 100%;
+}
+
+.item {
+  width: 100%;
+  height: 240px;
+  position: relative;
+  z-index: 1;
+}
+
+.itemScene {
+  width: 100%;
+  height: 100%;
+}
