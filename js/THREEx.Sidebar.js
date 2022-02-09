@@ -4,10 +4,18 @@ var THREEx = THREEx || {};
 THREEx.Sidebar = function (viewportScene, viewportCamera) {
   this.viewportScene = viewportScene;
   this.viewportCamera = viewportCamera;
-  this.scenes = [];
+
+  const camera = new THREE.PerspectiveCamera(
+    45,
+    THREEx.Constants.SIDEBAR_WIDTH / THREEx.Constants.ITEM_HEIGHT,
+    0.1,
+    1000
+  );
+  camera.position.set(1, 2, 5);
 
   let canvas;
   let renderer;
+  let scenes = [];
   let dragHandlers = [];
 
   const scope = this;
@@ -37,13 +45,6 @@ THREEx.Sidebar = function (viewportScene, viewportCamera) {
 
       sidebar.appendChild(item);
 
-      const camera = new THREE.PerspectiveCamera(
-        75,
-        THREEx.Constants.SIDEBAR_WIDTH / THREEx.Constants.ITEM_HEIGHT,
-        0.1,
-        1000
-      );
-      camera.position.set(1, 2, 3);
       camera.lookAt(scene.position);
       scene.userData.camera = camera;
 
@@ -55,19 +56,10 @@ THREEx.Sidebar = function (viewportScene, viewportCamera) {
       );
 
       scene.add(element);
-      this.scenes.push(scene);
+      scenes.push(scene);
       dragHandlers.push(dragHandler);
     });
   };
-
-  function updateSize() {
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-
-    if (canvas.width !== width || canvas.height !== height) {
-      renderer.setSize(width, height, false);
-    }
-  }
 
   this.animate = function () {
     render();
@@ -76,13 +68,13 @@ THREEx.Sidebar = function (viewportScene, viewportCamera) {
 
   function render() {
     updateSize();
-    renderer.setClearColor(0xffffff);
+    renderer.setClearColor(0xe0e0e0);
     renderer.setScissorTest(false);
     renderer.clear();
     renderer.setClearColor(0xe0e0e0);
     renderer.setScissorTest(true);
 
-    scope.scenes.forEach((scene) => {
+    scenes.forEach((scene) => {
       const element = scene.userData.element;
       const rect = element.getBoundingClientRect();
 
@@ -109,6 +101,15 @@ THREEx.Sidebar = function (viewportScene, viewportCamera) {
 
       renderer.render(scene, camera);
     });
+  }
+
+  function updateSize() {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    if (canvas.width !== width || canvas.height !== height) {
+      renderer.setSize(width, height, false);
+    }
   }
 
   function update() {
