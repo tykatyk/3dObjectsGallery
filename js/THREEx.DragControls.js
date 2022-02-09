@@ -13,13 +13,13 @@ THREEx.DragControls = function (
   this.domElement = domElement;
 
   const states = { IDLE: -1, ACTIVE: 0, ADDED: 1 };
-  this.state = states.IDLE;
+  let state = states.IDLE;
   this.object = null;
   this.dragPosition = new THREE.Vector2();
   const that = this;
 
   this.update = function () {
-    if (this.state === states.IDLE) return;
+    if (state === states.IDLE) return;
     if (this.dragPosition.x <= 0) return;
 
     const viewportWidth = document.getElementById("viewport").offsetWidth;
@@ -39,13 +39,13 @@ THREEx.DragControls = function (
       .copy(this.viewportCamera.position)
       .sub(vectorMouse.multiplyScalar(distance));
 
-    if (this.state !== states.ADDED) {
+    if (state !== states.ADDED) {
       let object = itemScene.children[0].clone();
       this.object = object;
       this.object.position.set(position.x, position.y, position.z);
       this.viewportScene.add(this.object);
 
-      this.state = states.ADDED;
+      state = states.ADDED;
     }
     this.object.position.set(position.x, position.y, position.z);
   };
@@ -53,7 +53,7 @@ THREEx.DragControls = function (
   function onMouseDown(event) {
     event.preventDefault();
 
-    that.state = states.ACTIVE;
+    state = states.ACTIVE;
 
     document.addEventListener("mousemove", onMouseMove, false);
     document.addEventListener("mouseup", onMouseUp, false);
@@ -69,7 +69,7 @@ THREEx.DragControls = function (
   }
 
   function onMouseUp(event) {
-    that.state = states.IDLE;
+    state = states.IDLE;
     that.object = null;
     that.dragPosition.x = 0;
     that.dragPosition.y = 0;
