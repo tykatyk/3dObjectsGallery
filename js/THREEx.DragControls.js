@@ -13,19 +13,19 @@ THREEx.DragControls = function (
   this.domElement = domElement;
 
   const states = { IDLE: -1, ACTIVE: 0, ADDED: 1 };
+  const dragPosition = new THREE.Vector2();
+
   let state = states.IDLE;
-  this.object = null;
-  this.dragPosition = new THREE.Vector2();
-  const that = this;
+  let object = null;
 
   this.update = function () {
     if (state === states.IDLE) return;
-    if (this.dragPosition.x <= 0) return;
+    if (dragPosition.x <= 0) return;
 
     const viewportWidth = document.getElementById("viewport").offsetWidth;
 
-    const x = (this.dragPosition.x / viewportWidth) * 2 - 1;
-    const y = -(this.dragPosition.y / window.innerHeight) * 2 + 1;
+    const x = (dragPosition.x / viewportWidth) * 2 - 1;
+    const y = -(dragPosition.y / window.innerHeight) * 2 + 1;
     const z = 0.5;
 
     let vectorMouse = new THREE.Vector3(x, y, z);
@@ -40,14 +40,13 @@ THREEx.DragControls = function (
       .sub(vectorMouse.multiplyScalar(distance));
 
     if (state !== states.ADDED) {
-      let object = itemScene.children[0].clone();
-      this.object = object;
-      this.object.position.set(position.x, position.y, position.z);
-      this.viewportScene.add(this.object);
+      object = itemScene.children[0].clone();
+      object.position.set(position.x, position.y, position.z);
+      this.viewportScene.add(object);
 
       state = states.ADDED;
     }
-    this.object.position.set(position.x, position.y, position.z);
+    object.position.set(position.x, position.y, position.z);
   };
 
   function onMouseDown(event) {
@@ -62,7 +61,7 @@ THREEx.DragControls = function (
   function onMouseMove(event) {
     event.preventDefault();
 
-    that.dragPosition.set(
+    dragPosition.set(
       event.clientX - THREEx.Constants.SIDEBAR_WIDTH,
       event.clientY
     );
@@ -70,9 +69,9 @@ THREEx.DragControls = function (
 
   function onMouseUp(event) {
     state = states.IDLE;
-    that.object = null;
-    that.dragPosition.x = 0;
-    that.dragPosition.y = 0;
+    object = null;
+    dragPosition.x = 0;
+    dragPosition.y = 0;
     document.removeEventListener("mousemove", onMouseMove, false);
     document.removeEventListener("mouseup", onMouseUp, false);
   }
