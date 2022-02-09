@@ -2,68 +2,46 @@
 var THREEx = THREEx || {};
 
 THREEx.Viewport = function () {
-  this.scene = null;
-  this.camera = null;
-  this.viewport = document.getElementById("viewport");
-  this.width = this.viewport.offsetWidth;
-
+  let scene;
+  let camera;
   let renderer;
   let controls;
 
-  const scope = this;
-
   this.init = function () {
-    this.scene = new THREE.Scene();
+    scene = new THREE.Scene();
 
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      this.width / window.innerHeight,
+    const viewport = document.getElementById("viewport");
+    const width = viewport.offsetWidth;
+
+    camera = new THREE.PerspectiveCamera(
+      45,
+      width / window.innerHeight,
       0.1,
       1000
     );
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize(this.width, window.innerHeight);
+    renderer.setSize(width, window.innerHeight);
 
-    this.viewport.appendChild(renderer.domElement);
+    viewport.appendChild(renderer.domElement);
+
     // EVENTS
-    THREEx.WindowResize(renderer, this.camera, this.width);
+    THREEx.WindowResize(renderer, camera, width);
+
     // CONTROLS
-    controls = new THREE.OrbitControls(this.camera, renderer.domElement);
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-    let geometry = new THREE.BoxGeometry();
-    let material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    let mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(0, 0.5, 4);
-    this.scene.add(mesh);
+    addObjects();
 
-    geometry = new THREE.SphereGeometry(1, 32, 16);
-    material = new THREE.MeshBasicMaterial({ color: 0xba1818 });
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(4, 3, -1);
-    this.scene.add(mesh);
-    // spheres's wireframe
-    geometry = new THREE.EdgesGeometry(mesh.geometry);
-    material = new THREE.LineBasicMaterial({ color: 0xffffff });
-    let wireframe = new THREE.LineSegments(geometry, material);
-    mesh.add(wireframe);
-
-    const grid = new THREE.GridHelper(100, 20);
-    this.scene.add(grid);
-
-    this.camera.position.set(0, 5, 15);
+    camera.position.set(0, 5, 30);
   };
 
   this.getScene = function () {
-    return this.scene;
+    return scene;
   };
 
   this.getCamera = function () {
-    return this.camera;
-  };
-
-  this.getWidth = function () {
-    return this.width;
+    return camera;
   };
 
   this.animate = function () {
@@ -71,8 +49,49 @@ THREEx.Viewport = function () {
     update();
   };
 
+  function addObjects() {
+    let geometry, material, mesh, wireframe;
+
+    //SKYBOX
+    geometry = new THREE.BoxGeometry(500, 500, 500);
+    material = new THREE.MeshBasicMaterial({
+      color: 0x9999ff,
+      side: THREE.BackSide,
+    });
+    mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    //CUBE
+    geometry = new THREE.BoxGeometry();
+    material = new THREE.MeshBasicMaterial({ color: 0xba1818 });
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(0, 0.5, 4);
+    scene.add(mesh);
+    // cube's wireframe
+    geometry = new THREE.EdgesGeometry(mesh.geometry); // or WireframeGeometry
+    material = new THREE.LineBasicMaterial({ color: 0xffffff });
+    wireframe = new THREE.LineSegments(geometry, material);
+    mesh.add(wireframe);
+
+    //SPHERE
+    geometry = new THREE.SphereGeometry(1, 32, 16);
+    material = new THREE.MeshBasicMaterial({ color: 0xba1818 });
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(4, 3, -1);
+    scene.add(mesh);
+    // spheres's wireframe
+    geometry = new THREE.EdgesGeometry(mesh.geometry);
+    material = new THREE.LineBasicMaterial({ color: 0xffffff });
+    wireframe = new THREE.LineSegments(geometry, material);
+    mesh.add(wireframe);
+
+    //GRID
+    const grid = new THREE.GridHelper(100, 20);
+    scene.add(grid);
+  }
+
   function render() {
-    renderer.render(scope.scene, scope.camera);
+    renderer.render(scene, camera);
   }
 
   function update() {
