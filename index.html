@@ -13,73 +13,36 @@
 			<div id="viewport"></div>
 		</div>
 		<script src="js/three.js"></script>
-		<script src="js/sidebar.js"></script>
 		<script src="js/OrbitControls.js"></script>
 		<script src="js/THREEx.Objects.js"></script>
 		<script src="js/THREEx.Constants.js"></script>
 		<script src="js/THREEx.DragControls.js"></script>
 		<script src="js/THREEx.WindowResize.js"></script>
+		<script src="js/THREEx.Viewport.js"></script>
+		<script src="js/THREEx.Sidebar.js"></script>
 		<script>
-			let scene, camera, renderer, controls;
-			let viewport = document.getElementById("viewport");
-			let width = viewport.offsetWidth;
+
+			const viewport = new THREEx.Viewport();
+			let sidebar = null;
 
 			init();
-			sidebar(scene, camera, width);
 			animate();
 			
 			function init() {
-				scene = new THREE.Scene();
+				viewport.init();
+				const viewportScene = viewport.getScene();
+				const viewportCamera = viewport.getCamera();
 				
-				camera = new THREE.PerspectiveCamera( 75, width/ window.innerHeight, 0.1, 1000 );
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setSize( width, window.innerHeight );
-
-				viewport.appendChild( renderer.domElement );
-				// EVENTS
-				THREEx.WindowResize(renderer, camera, width);
-				// CONTROLS
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
-
-				let geometry = new THREE.BoxGeometry();
-				let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-				let mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set(0,0.5,4);
-				scene.add( mesh );
-
-				geometry = new THREE.SphereGeometry(1, 32, 16);
-				material = new THREE.MeshBasicMaterial({ color: 0xba1818 });
-				mesh = new THREE.Mesh(geometry, material);
-				mesh.position.set(4,3,-1);
-				scene.add( mesh );
-				// spheres's wireframe
-				geometry = new THREE.EdgesGeometry(mesh.geometry);
-				material = new THREE.LineBasicMaterial({ color: 0xffffff });
-				let wireframe = new THREE.LineSegments(geometry, material);
-				mesh.add(wireframe);
-
-				const grid = new THREE.GridHelper(100, 20);
-				scene.add(grid);
-
-				camera.position.set(0, 5, 15);
+				sidebar = new THREEx.Sidebar(viewportScene, viewportCamera);
+				sidebar.init();
 			}
 
 			function animate() {
-				requestAnimationFrame( animate );
-
-				render();
-				update();
+				requestAnimationFrame(animate);
+				
+				viewport.animate();
+				sidebar.animate();
 			};
-
-			function update() {
-				controls.update();
-			}
-
-			function render() {
-				renderer.render( scene, camera );
-			}
-
 		</script>
 	</body>
 </html>
